@@ -9,8 +9,8 @@
 /coverage
 
 #IDE Cache
-/.idea
-.idea
+/.idea/
+.idea/
 
 # production
 /build
