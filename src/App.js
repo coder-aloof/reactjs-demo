@@ -1,40 +1,54 @@
 import React, {Component} from 'react';
 import Button from "./components/Button";
 import "./css/style.css"
+const operators = ['/', '-', '+', '*'];
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            total: '0',
             current: '0',
-            previous: [],
+            expression: '',
             nextIsReset: false
         }
     }
     reset = (symbol) => {
-        this.setState({current: '0', previous: [], nextIsReset: false});
+        this.setState({total: '0', current: '0', expression: '', nextIsReset: false});
     };
 
     addToCurrent = (symbol) => {
-        if (["/", "-", "+", "*"].indexOf(symbol) > - 1) {
-            let {previous} = this.state;
-            previous.push(this.state.current + symbol);
-            this.setState({previous, nextIsReset: true});
+        let {expression} = this.state;
+        if (operators.indexOf(symbol) > -1) {
+            if (expression.length > 0) {
+                if (operators.indexOf(expression[expression.length - 1]) === -1) {
+                    expression = expression.concat(symbol);
+                    this.setState({expression, nextIsReset: true});
+                }
+            }
         } else {
-            if ((this.state.current === "0" && symbol !== ".") || this.state.nextIsReset) {
+            expression = expression.concat(symbol);
+            this.setState({expression});
+            if ((this.state.current === '0' && this.state.symbol !== '.') || this.state.nextIsReset) {
                 this.setState({current: symbol, nextIsReset: false});
             } else {
-                this.setState({current: this.state.current + symbol})
+                this.setState({current: this.state.current + symbol});
             }
         }
     };
 
     calculate = (symbol) => {
-        let {current, previous} = this.state;
-        if (previous.length > 0) {
-            current = eval(String(previous[previous.length - 1] + current));
-            this.setState({current, previous: [], nextIsReset: true});
+        let {total, expression} = this.state;
+        if (expression.length > 0) {
+            if (operators.indexOf(expression[expression.length - 1]) === -1) {
+                total = String(this.evaluateExpression(expression));
+                this.setState({total, current: total, expression: total, nextIsReset: true});
+            }
         }
+    };
+
+    evaluateExpression = (exp) => {
+        return new Function('return ' + exp)();
     };
 
     render() {
@@ -59,8 +73,8 @@ class App extends Component {
         ];
         return (
             <div className="App">
-                {this.state.previous.length > 0 ?
-                    <div className="floaty-last">{this.state.previous[this.state.previous.length - 1]}</div>
+                {this.state.expression.length > 0 ?
+                    <div className="floaty-last">{this.state.expression}</div>
                     : null
                 }
                 <input className="result" type="text" value={this.state.current} />
