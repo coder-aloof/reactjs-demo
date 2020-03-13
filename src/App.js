@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import Button from "./components/Button";
 import "./css/style.css"
-const operators = ['/', '-', '+', '*'];
+import {Parser} from "expr-eval";
 
+const operators = ['/', '-', '+', '*'];
 class App extends Component {
     constructor(props) {
         super(props);
@@ -13,6 +14,7 @@ class App extends Component {
             nextIsReset: false
         }
     }
+
     reset = (symbol) => {
         this.setState({total: '0', current: '0', expression: '', nextIsReset: false});
     };
@@ -41,14 +43,10 @@ class App extends Component {
         let {total, expression} = this.state;
         if (expression.length > 0) {
             if (operators.indexOf(expression[expression.length - 1]) === -1) {
-                total = String(this.evaluateExpression(expression));
+                total = String(new Parser().evaluate(expression));
                 this.setState({total, current: total, expression: total, nextIsReset: true});
             }
         }
-    };
-
-    evaluateExpression = (exp) => {
-        return new Function('return ' + exp)();
     };
 
     render() {
